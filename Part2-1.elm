@@ -24,4 +24,4 @@ textBox txt (w,h) = container w h middle <| show txt
 --  - Maybe Elm provides a window dimension Signal we can respond to?
 
 main : Signal Element
-main = H
+main = Signal.map (textBox "hello" dim) Window.dimensions

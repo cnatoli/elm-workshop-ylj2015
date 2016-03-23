@@ -61,10 +61,11 @@ stepGame {paddle1,paddle2,delta}
       player1' = stepPlyr delta paddle1 player1
       player2' = stepPlyr delta paddle2 player2
 
+      ball'    = stepBall delta ball player1 player2
   in
       { game | player1 <- player1'
              , player2 <- player2'
-             , ball    <- H}
+             , ball    <- ball'}
 
 main = Signal.map2 display Window.dimensions gameState
 

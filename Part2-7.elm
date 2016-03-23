@@ -24,11 +24,16 @@ textGreen = rgb 160 200 160
 -- one on each side of the court
 
 display : (Int,Int) -> Element
-display (w,h) =
-  H
+display (w,h) = container w h middle <|
+                     collage gameWidth gameHeight
+                        [
+                         court gameWidth gameHeight,
+                         move (-halfWidth + 10, 0)  <| paddle red 10 40,
+                         move ( halfWidth - 10, 0)  <| paddle black 10 40
+                        ]
 
 
-
+main = Signal.map display Window.dimensions
 
 
 

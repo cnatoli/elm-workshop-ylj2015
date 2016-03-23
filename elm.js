@@ -3123,10 +3123,199 @@ Elm.Main.make = function (_elm) {
    $moduleName = "Main",
    $Basics = Elm.Basics.make(_elm),
    $Color = Elm.Color.make(_elm),
+   $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
    $Graphics$Element = Elm.Graphics.Element.make(_elm),
    $Keyboard = Elm.Keyboard.make(_elm),
    $Signal = Elm.Signal.make(_elm),
-   $Time = Elm.Time.make(_elm);
+   $Text = Elm.Text.make(_elm),
+   $Time = Elm.Time.make(_elm),
+   $Window = Elm.Window.make(_elm);
+   var displayObj = F2(function (obj,
+   shape) {
+      return A2($Graphics$Collage.move,
+      {ctor: "_Tuple2"
+      ,_0: obj.x
+      ,_1: obj.y},
+      A2($Graphics$Collage.filled,
+      $Color.white,
+      shape));
+   });
+   var stepV = F3(function (v,
+   lowerCollision,
+   upperCollision) {
+      return lowerCollision ? $Basics.abs(v) : upperCollision ? 0 - $Basics.abs(v) : v;
+   });
+   var stepObj = F2(function (t,
+   _v0) {
+      return function () {
+         return _U.replace([["x"
+                            ,_v0.x + _v0.vx * t]
+                           ,["y",_v0.y + _v0.vy * t]],
+         _v0);
+      }();
+   });
+   var near = F3(function (n,c,m) {
+      return _U.cmp(m,
+      n - c) > -1 && _U.cmp(m,
+      n + c) < 1;
+   });
+   var within = F2(function (ball,
+   player) {
+      return A2(near,
+      player.x,
+      8)(ball.x) && A2(near,
+      player.y,
+      20)(ball.y);
+   });
+   var Game = F3(function (a,b,c) {
+      return {_: {}
+             ,ball: c
+             ,player1: a
+             ,player2: b};
+   });
+   var player = function (x) {
+      return {_: {}
+             ,score: 0
+             ,vx: 0
+             ,vy: 0
+             ,x: x
+             ,y: 0};
+   };
+   var Object = F5(function (a,
+   b,
+   c,
+   d,
+   e) {
+      return _U.insert("vy",
+      d,
+      _U.insert("vx",
+      c,
+      _U.insert("y",
+      b,
+      _U.insert("x",a,e))));
+   });
+   var defaultVxy = 200;
+   var defaultBall = {_: {}
+                     ,vx: defaultVxy
+                     ,vy: defaultVxy
+                     ,x: 0
+                     ,y: 0};
+   var textGreen = A3($Color.rgb,
+   160,
+   200,
+   160);
+   var pongGreen = A3($Color.rgb,
+   60,
+   100,
+   60);
+   var paddleOffset = 20;
+   var $ = {ctor: "_Tuple2"
+           ,_0: 300
+           ,_1: 200},
+   halfWidth = $._0,
+   halfHeight = $._1;
+   var defaultGame = {_: {}
+                     ,ball: defaultBall
+                     ,player1: player(paddleOffset - halfWidth)
+                     ,player2: player(halfWidth - paddleOffset)};
+   var stepBall = F4(function (t,
+   _v2,
+   player1,
+   player2) {
+      return function () {
+         return $Basics.not(A2(near,
+         0,
+         halfWidth)(_v2.x)) ? _U.replace([["x"
+                                          ,0]
+                                         ,["y",0]],
+         _v2) : function () {
+            var vy$ = A3(stepV,
+            _v2.vy,
+            _U.cmp(_v2.y,
+            7 - halfHeight) < 0,
+            _U.cmp(_v2.y,
+            halfHeight - 7) > 0);
+            var vx$ = A3(stepV,
+            _v2.vx,
+            A2(within,_v2,player1),
+            A2(within,_v2,player2));
+            return A2(stepObj,
+            t,
+            _U.replace([["vx",vx$]
+                       ,["vy",vy$]],
+            _v2));
+         }();
+      }();
+   });
+   var $ = {ctor: "_Tuple2"
+           ,_0: 600
+           ,_1: 400},
+   gameWidth = $._0,
+   gameHeight = $._1;
+   var display = F2(function (_v4,
+   _v5) {
+      return function () {
+         return function () {
+            switch (_v4.ctor)
+            {case "_Tuple2":
+               return function () {
+                    var scoreText = $Graphics$Collage.outlinedText(_U.replace([["color"
+                                                                               ,$Color.white]
+                                                                              ,["width"
+                                                                               ,2]],
+                    $Graphics$Collage.defaultLine))($Text.typeface(_L.fromArray(["helvetica"]))($Text.color(textGreen)($Text.height(60)($Text.fromString(A2($Basics._op["++"],
+                    $Basics.toString(_v5.player1.score),
+                    A2($Basics._op["++"],
+                    "    ",
+                    $Basics.toString(_v5.player2.score))))))));
+                    var offset = 10;
+                    return A3($Graphics$Element.container,
+                    _v4._0,
+                    _v4._1,
+                    $Graphics$Element.middle)(A3($Graphics$Collage.collage,
+                    gameWidth,
+                    gameHeight,
+                    _L.fromArray([$Graphics$Collage.filled(pongGreen)(A2($Graphics$Collage.rect,
+                                 gameWidth,
+                                 gameHeight))
+                                 ,$Graphics$Collage.outlined($Graphics$Collage.solid($Color.white))(A2($Graphics$Collage.rect,
+                                 gameWidth - offset,
+                                 gameHeight - offset))
+                                 ,$Graphics$Collage.outlined($Graphics$Collage.solid($Color.white))($Graphics$Collage.circle(40))
+                                 ,$Graphics$Collage.traced($Graphics$Collage.solid($Color.white))(A2($Graphics$Collage.segment,
+                                 {ctor: "_Tuple2"
+                                 ,_0: 0
+                                 ,_1: offset / 2 - halfHeight},
+                                 {ctor: "_Tuple2"
+                                 ,_0: 0
+                                 ,_1: halfHeight - offset / 2}))
+                                 ,A2(displayObj,
+                                 _v5.player1,
+                                 A2($Graphics$Collage.rect,
+                                 10,
+                                 40))
+                                 ,A2(displayObj,
+                                 _v5.player2,
+                                 A2($Graphics$Collage.rect,
+                                 10,
+                                 40))
+                                 ,A2(displayObj,
+                                 _v5.ball,
+                                 A2($Graphics$Collage.oval,
+                                 15,
+                                 15))
+                                 ,$Graphics$Collage.move({ctor: "_Tuple2"
+                                                         ,_0: 0
+                                                         ,_1: gameHeight / 2 - offset * 3})(scoreText)])));
+                 }();}
+            _U.badCase($moduleName,
+            "between lines 161 and 191");
+         }();
+      }();
+   });
+   var delta = A2($Signal._op["<~"],
+   $Time.inSeconds,
+   $Time.fps(50));
    var dirToInt = function (dir) {
       return function () {
          switch (dir.ctor)
@@ -3134,12 +3323,63 @@ Elm.Main.make = function (_elm) {
             case "Stopped": return 0;
             case "Up": return 1;}
          _U.badCase($moduleName,
-         "between lines 96 and 99");
+         "between lines 22 and 25");
       }();
    };
-   var delta = A2($Signal._op["<~"],
-   $Time.inSeconds,
-   $Time.fps(35));
+   var stepPlyr = F4(function (t,
+   dir,
+   player,
+   scored) {
+      return function () {
+         var score$ = player.score + (scored ? 1 : 0);
+         var dir$ = dirToInt(dir);
+         var player$ = A2(stepObj,
+         t,
+         _U.replace([["vy"
+                     ,$Basics.toFloat(dir$) * defaultVxy]],
+         player));
+         var y$ = A3($Basics.clamp,
+         22 - halfHeight,
+         halfHeight - 22,
+         player$.y);
+         return _U.replace([["y",y$]
+                           ,["score",score$]],
+         player$);
+      }();
+   });
+   var stepGame = F2(function (_v11,
+   _v12) {
+      return function () {
+         return function () {
+            return function () {
+               var ball$ = A4(stepBall,
+               _v11.delta,
+               _v12.ball,
+               _v12.player1,
+               _v12.player2);
+               var player2$ = A4(stepPlyr,
+               _v11.delta,
+               _v11.paddle2,
+               _v12.player2,
+               _U.cmp(_v12.ball.x,
+               0 - halfWidth) < 0);
+               var player1$ = A4(stepPlyr,
+               _v11.delta,
+               _v11.paddle1,
+               _v12.player1,
+               _U.cmp(_v12.ball.x,
+               halfWidth) > 0);
+               var paddle2$ = dirToInt(_v11.paddle2);
+               var paddle1$ = dirToInt(_v11.paddle1);
+               return _U.replace([["player1"
+                                  ,player1$]
+                                 ,["player2",player2$]
+                                 ,["ball",ball$]],
+               _v12);
+            }();
+         }();
+      }();
+   });
    var Input = F3(function (a,
    b,
    c) {
@@ -3175,83 +3415,47 @@ Elm.Main.make = function (_elm) {
    },
    $Keyboard.arrows)),
    delta));
-   var textGreen = A3($Color.rgb,
-   160,
-   200,
-   160);
-   var pongGreen = A3($Color.rgb,
-   60,
-   100,
-   60);
-   var $ = {ctor: "_Tuple2"
-           ,_0: 300
-           ,_1: 200},
-   halfWidth = $._0,
-   halfHeight = $._1;
-   var $ = {ctor: "_Tuple2"
-           ,_0: 600
-           ,_1: 400},
-   gameWidth = $._0,
-   gameHeight = $._1;
-   var Game = F3(function (a,b,c) {
-      return {_: {}
-             ,ball: c
-             ,player1: a
-             ,player2: b};
-   });
-   var defaultBall = {_: {}
-                     ,vx: 200
-                     ,vy: 200
-                     ,x: 0
-                     ,y: 0};
-   var player = function (x) {
-      return {_: {}
-             ,vx: 0
-             ,vy: 0
-             ,x: x
-             ,y: 0};
-   };
-   var defaultGame = {_: {}
-                     ,ball: defaultBall
-                     ,player1: player(20 - halfWidth)
-                     ,player2: player(halfWidth - 20)};
-   var main = $Graphics$Element.show(defaultGame);
-   var Object = F5(function (a,
-   b,
-   c,
-   d,
-   e) {
-      return _U.insert("vy",
-      d,
-      _U.insert("vx",
-      c,
-      _U.insert("y",
-      b,
-      _U.insert("x",a,e))));
-   });
-   var H = {ctor: "H"};
+   var gameState = A3($Signal.foldp,
+   stepGame,
+   defaultGame,
+   input);
+   var main = A3($Signal.map2,
+   display,
+   $Window.dimensions,
+   gameState);
    _elm.Main.values = {_op: _op
-                      ,H: H
+                      ,Up: Up
+                      ,Stopped: Stopped
+                      ,Down: Down
+                      ,Input: Input
+                      ,dirToInt: dirToInt
+                      ,intToDir: intToDir
+                      ,delta: delta
+                      ,input: input
+                      ,gameHeight: gameHeight
+                      ,gameWidth: gameWidth
+                      ,halfHeight: halfHeight
+                      ,halfWidth: halfWidth
+                      ,paddleOffset: paddleOffset
+                      ,pongGreen: pongGreen
+                      ,textGreen: textGreen
+                      ,defaultVxy: defaultVxy
                       ,Object: Object
                       ,player: player
                       ,defaultBall: defaultBall
                       ,Game: Game
                       ,defaultGame: defaultGame
-                      ,main: main
-                      ,gameHeight: gameHeight
-                      ,gameWidth: gameWidth
-                      ,halfHeight: halfHeight
-                      ,halfWidth: halfWidth
-                      ,pongGreen: pongGreen
-                      ,textGreen: textGreen
-                      ,Up: Up
-                      ,Stopped: Stopped
-                      ,Down: Down
-                      ,Input: Input
-                      ,delta: delta
-                      ,dirToInt: dirToInt
-                      ,intToDir: intToDir
-                      ,input: input};
+                      ,near: near
+                      ,within: within
+                      ,stepObj: stepObj
+                      ,stepV: stepV
+                      ,stepPlyr: stepPlyr
+                      ,stepBall: stepBall
+                      ,stepGame: stepGame
+                      ,gameState: gameState
+                      ,displayObj: displayObj
+                      ,display: display
+                      ,main: main};
    return _elm.Main.values;
 };
 Elm.Maybe = Elm.Maybe || {};

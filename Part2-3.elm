@@ -36,7 +36,7 @@ scene2 txt (w,h) =
             [ toForm         <| show txt,
               move (50,50)   <| filled blue (oval 100 100),
               move (-70,-70) <| filled yellow (rect 100 100),
-              H
+              move (-100, -100) <| alpha 0.5 <| filled red (ngon 7 80)
             ]
 
 main : Signal Element

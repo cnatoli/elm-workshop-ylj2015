@@ -51,7 +51,7 @@ stepGame {paddle1,paddle2,delta}
 -- Hint:
 --   - we need to "accumulate" game states over time
 gameState : Signal Game
-gameState = H
+gameState = foldp stepGame defaultGame input
 
 main = Signal.map show gameState
 

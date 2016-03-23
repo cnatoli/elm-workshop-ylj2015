@@ -42,8 +42,10 @@ scene3 txt angle (w,h) =
     container w h middle <|
     collage gameWidth gameHeight
             [
-              H
+             toForm <| show txt,
+             orbit angle (100, 100) (filled blue (oval 100 100)),
+             orbitCCW angle (150, 150) (alpha 0.7 (filled red (ngon 9 70)))
             ]
 
 main : Signal Element
-main = (scene3 "hello") <~ H
+main = (scene3 "hello") <~ time ~ Window.dimensions

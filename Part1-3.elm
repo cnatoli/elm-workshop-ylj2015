@@ -35,7 +35,6 @@ intToDir x =
        | otherwise -> Stopped
 
 
-
 -- Exercise 1.2
 -- Using the helper function we defined before `recordToDir`, create a signal that represents the game input over time
 -- Hint:
@@ -44,8 +43,7 @@ intToDir x =
 
 
 input : Signal Input
-input = sampleOn delta <| H
-
+input =  sampleOn delta <| Signal.map3 Input (recordToDir <~ Keyboard.wasd) (recordToDir <~ Keyboard.arrows) delta
 
 main : Signal Element
 main = Signal.map show input

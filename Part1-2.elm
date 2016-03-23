@@ -52,11 +52,19 @@ keysOverTime = sampleOn delta <| Signal.map2 (,) Keyboard.wasd Keyboard.arrows
 -- Write another signal `paddlesOverTime` which does exactly that
 
 recordToDir : { x : Int, y : Int } -> Direction
-recordToDir = H
+recordToDir {x,y} = intToDir y  -- intToDir << .y
+
+
+-- main : Signal Element
+-- main = Signal.map show (Signal.map recordToDir (Signal.map fst keysOverTime))
 
 
 paddlesOverTime : Signal (Direction, Direction)
-paddlesOverTime = sampleOn delta <| H
+--paddlesOverTime = sampleOn delta <| Signal.map (\p -> ((recordToDir (fst p)), (recordToDir (snd p)))) keysOverTime
+
+paddlesOverTime = sampleOn delta <| (,) <~ (recordToDir <~ Keyboard.wasd)
+                                         ~ (recordToDir <~ Keyboard.arrows)
+
 
 main : Signal Element
 main = Signal.map show paddlesOverTime
